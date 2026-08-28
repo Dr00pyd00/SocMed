@@ -1,0 +1,19 @@
+{
+  "venvPath": ".",
+  "venv": ".venv",
+  "pythonVersion": "3.14",
+  "typeCheckingMode": "basic",
+  "reportMissingImports": "warning",
+  "reportMissingModuleSource": "none",
+  "reportAttributeAccessIssue": "none",
+  "reportCallIssue": "none",
+  "reportOptionalMemberAccess": "none",
+  "reportIncompatibleVariableOverride": "none",
+  "reportGeneralTypeIssues": "warning",
+  "reportAssignmentType": "none",
+  "exclude": [
+    "**/migrations",
+    "**/__pycache__",
+    ".venv"
+  ]
+}

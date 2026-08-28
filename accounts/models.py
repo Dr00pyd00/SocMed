@@ -1,9 +1,10 @@
+from django.conf import settings
 from django.db import models
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
-# Create your models here.
 
+# =============== USER setup  ========================================================
 class CustomUserManager(BaseUserManager):
     """
     tool for manager the CustomUsers creations etc 
@@ -49,3 +50,23 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+# ========================== Profile ======================================
+class UserProfile(models.Model):
+    """ 
+    All data of a User to display a Profile Page for example 
+    """ 
+    # TODO mettre en place avatars avec dossier images et tout 
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
+    pseudo = models.TextField(blank=True)
+    bio = models.TextField(blank=True)
+    website = models.URLField(blank=True)
+    birth = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return self.user.email 
+
+
+
