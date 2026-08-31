@@ -42,7 +42,10 @@ def login_view(request):
     return render(request, 'accounts/login.html', {'form':form} )
 
 
-
+# le login_required envoi vers LOGIN_URL et rajoute ?next='la on on etait avant de cliquer' comme ca ca redirige
+# exemple je me connecte a /profile  mais pas login:
+#   ca envoir vers LOGIN_URL?next=/profile 
+#   et une fois login ca lis le next automatiquement aller sur l'url ?
 @login_required # si non login ca prend l'url LOGIN_URL dans settings ( accounts/login/ par defaut ) 
 @require_POST
 def logout_view(request):
