@@ -37,6 +37,9 @@ ALLOWED_HOSTS = []
 # ajout du nouveau model user a prendre en compte
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
+# address ou ca redirige si besoin de login
+LOGIN_URL = 'login' # name du path 
+
 
 # Application definition
 
