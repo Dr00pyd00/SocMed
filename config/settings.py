@@ -154,3 +154,11 @@ AXES_FAILURE_LIMIT = 5          # nombre d'echecs avant blocage
 AXES_COOLOFF_TIME = 1           # duree du blocage, en heures
 AXES_LOCKOUT_PARAMETERS = ['username', 'ip_address']   # bloque par email, pas juste par IP
 
+
+# Setup pour les images ===============================================================
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+
