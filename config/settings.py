@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'axes',     # AJOUTER POUR AXE
 ]
 
 MIDDLEWARE = [
@@ -61,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware',   # AJOUTER CA POUR AXE
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -139,3 +141,16 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+
+# AXE setups a faire ================================================================
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',   # doit etre en premier 
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+AXES_FAILURE_LIMIT = 5          # nombre d'echecs avant blocage
+AXES_COOLOFF_TIME = 1           # duree du blocage, en heures
+AXES_LOCKOUT_PARAMETERS = ['username', 'ip_address']   # bloque par email, pas juste par IP
+
