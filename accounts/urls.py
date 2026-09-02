@@ -10,6 +10,8 @@ urlpatterns = [
         path('login/', views.login_view, name='login'),
         path('logout/', views.logout_view, name='logout'),
         path('register/', views.register_view, name='register'),
+        path('profile/<int:pk>/', views.profile_view, name='profile-view'),
+        path('profile/edit/', views.edit_profile_view, name='profile-edit'),
 
         # pour reset le mdp ==============================================================================================
 
