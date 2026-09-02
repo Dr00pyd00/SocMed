@@ -57,8 +57,6 @@ class UserProfile(models.Model):
     """ 
     All data of a User to display a Profile Page for example 
     """ 
-    # TODO mettre en place avatars avec dossier images et tout 
-
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
     pseudo = models.TextField(blank=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)

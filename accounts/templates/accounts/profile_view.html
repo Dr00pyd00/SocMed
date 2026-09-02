@@ -1,0 +1,30 @@
+
+
+{% extends "base.html" %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+
+    <section>
+    
+        <h1>{{ profile.pseudo|default:profile_user.email }}</h1>
+
+        {% if profile.avatar %}
+            <img src="{{ profile.avatar.url }}" alt="Avatar" width="150">
+        {% endif %}
+
+        <p>{{ profile.bio }}</p>
+
+        {% if profile.website %}
+            <a href="{{ profile.website }}">{{ profile.website }}</a>
+        {% endif %}
+
+        {% if user == profile_user %}
+            <a href="{% url 'profile-edit' %}">Modifier mon profil</a>
+        {% endif %}
+
+    </section>
+   
+{% endblock %}
+
