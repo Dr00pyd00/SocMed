@@ -3,6 +3,9 @@ from django.urls import reverse
 
 from accounts.models import CustomUser
 
+# pour tester un file ( image par exemple )
+from django.core.files.uploadedfile import SimpleUploadedFile
+
 
 # For register view ====================================================================================
 class RegisterViewTest(TestCase):
@@ -161,6 +164,12 @@ class LogoutViewTest(TestCase):
 
 # profile tests =======================================================================================================
 
+# Il faut un decorateur pour eviter de polluer physiquement le dossier Media:
+import tempfile
+from django.test import override_settings
+
+
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
 class ProfileViewTest(TestCase):
 
     data = {'email':'test@example.com','password':'GoodPassWord123'}
@@ -176,6 +185,111 @@ class ProfileViewTest(TestCase):
         # Assert 
         self.assertEqual(response.status_code, 200)
 
+
+    def test_if_profile_not_exist_fail(self):
+        # Act 
+        response = self.client.get(reverse('profile-view', args=['999']))
+
+        # Assert 
+        self.assertEqual(response.status_code, 404)
+
+
+    def test_profile_update_success(self):
+        # Arrange
+        self.client.force_login(self.user)
+        new_data = {
+            'pseudo': 'MonPseudo',
+            'bio': 'Ma biographie',
+            'website': 'https://example.com',
+            'birth': '1990-05-15',
+        }
+
+        # Act 
+        response = self.client.post(reverse('profile-edit'), new_data)
+        self.user.profile.refresh_from_db() # ne pas oublier sinon update pas prise en compte en memoire
+
+        # Assert 
+        self.assertEqual(response.status_code, 302)     # car ya un redirect dans la view
+        self.assertRedirects(response, reverse('profile-view', args=[self.user.pk])) # on cverifie la redirection precise
+        self.assertEqual(self.user.profile.pseudo, new_data['pseudo'])
+        self.assertEqual(self.user.profile.bio, new_data['bio'])
+
+
+
+    def test_profile_update_fail(self):
+        # Arrange
+        self.client.force_login(self.user)
+        new_data = {
+            'pseudo': 'MonPseudo',
+            'bio': 'Ma biographie',
+            'website': 'BAD_MAIL',
+            'birth': 'BAD_BIRTH',
+        }
+
+        # Act 
+        response = self.client.post(reverse('profile-edit'), new_data)
+        self.user.profile.refresh_from_db() # ne pas oublier sinon update pas prise en compte en memoire
+
+        # Assert 
+        self.assertEqual(response.status_code, 200)  # recharche le formulaire car ca fail
+        self.assertNotEqual(self.user.profile.website, new_data['website'])
+        self.assertNotEqual(self.user.profile.birth, new_data['birth'])
+
+
+    def test_profile_update_without_login_fail(self):
+        # Act 
+        response = self.client.get(reverse('profile-edit'))
+
+        # Assert 
+        self.assertEqual(response.status_code, 302) # redirection vers LOGIN_URL
+
+
+    def test_profile_update_with_avatar_success(self):
+        # Arrange
+        self.client.force_login(self.user)
+
+        # une vraie image PNG minimale, en octets bruts
+        image_content = (
+            b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01'
+            b'\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\x9cc\x00\x01'
+            b'\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82'
+        )
+        avatar = SimpleUploadedFile('test.png', image_content, content_type='image/png')
+
+        data = {
+            'pseudo': 'MonPseudo',
+            'bio': '',
+            'website': '',
+            'avatar': avatar,
+        }
+
+        # Act
+        self.client.post(reverse('profile-edit'), data)
+        self.user.profile.refresh_from_db()
+
+        # Assert
+        self.assertTrue(self.user.profile.avatar)
+        self.assertIn('test', self.user.profile.avatar.name)
+
+
+    def test_profile_update_with_avatar_fail(self):
+        # Arrange 
+        self.client.force_login(self.user)
+        false_avatar = SimpleUploadedFile('bad_avatar.png', b'bad_image', content_type='image/png')
+
+        data = {
+            'pseudo': 'MonPseudo',
+            'bio': '',
+            'website': '',
+            'avatar': false_avatar,
+        }
+
+        # Act 
+        self.client.post(reverse('profile-edit'), data)
+        self.user.profile.refresh_from_db()
+
+        # Assert
+        self.assertFalse(self.user.profile.avatar)
     
 
 
