@@ -1,10 +1,11 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.urls import reverse
 
-from accounts.forms import LoginForm, RegisterForm
+from accounts.forms import EditProfileForm, LoginForm, RegisterForm
+from accounts.models import CustomUser
 
 
 # Create your views here.
@@ -32,7 +33,7 @@ def login_view(request):
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 # vu que User est not None l'auth a reussi , plus besoin de pw
-                login(request, user)
+                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 # c'est le @required_login qui inject le ?next auto on le recup ici si il existe, dans le html il faut le catch et le donner ici grace a un input hidden
                 next_url = request.POST.get('next') or request.GET.get('next') or 'home'
                 return redirect(next_url)
@@ -65,7 +66,7 @@ def register_view(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('home')
     else:
         form = RegisterForm()
@@ -73,6 +74,26 @@ def register_view(request):
 
 
 
+@login_required
+def edit_profile_view(request):
+    # on chope le profile du current user pour modifier cette instance 
+    profile = request.user.profile
+    if request.method == 'POST':
+        # on doit mettre request.FILES car c'est par cette objet que l'image transit
+        form = EditProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile-view', pk=request.user.pk)
+    else:
+        form = EditProfileForm(instance=profile)
+
+    return render(request, 'accounts/profile_edit.html', {'form':form})
+
+
+def profile_view(request, pk):
+    profile_user = get_object_or_404(CustomUser, pk=pk)
+    profile = profile_user.profile
+    return render(request, 'accounts/profile_view.html', {'profile':profile, 'profile_user':profile_user})
 
 
 

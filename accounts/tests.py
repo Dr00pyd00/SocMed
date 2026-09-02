@@ -112,7 +112,7 @@ class LogoutViewTest(TestCase):
 
     def test_logout_sucess(self):
         # Arrange 
-        self.client.login(**self.data)
+        self.client.force_login(self.user)
 
         # Act 
         response = self.client.post(reverse('logout'))
@@ -126,7 +126,7 @@ class LogoutViewTest(TestCase):
     def test_logout_required_post_not_get_fail(self):
         # Arrange
         # on utlise une methode test django qui bypass les view et login auto car on veut pas tester la logique de login ici
-        self.client.login(**self.data)
+        self.client.force_login(self.user)
 
         # Act 
         response = self.client.get(reverse('logout'))
@@ -148,7 +148,7 @@ class LogoutViewTest(TestCase):
 
     def test_logout_ends_session_sucess(self):
         # Arrange 
-        self.client.login(**self.data)
+        self.client.force_login(self.user)
 
         # Act 
         self.client.post(reverse('logout'))
@@ -158,6 +158,23 @@ class LogoutViewTest(TestCase):
         self.assertFalse(response.wsgi_request.user.is_authenticated)
 
 
+
+# profile tests =======================================================================================================
+
+class ProfileViewTest(TestCase):
+
+    data = {'email':'test@example.com','password':'GoodPassWord123'}
+
+    def setUp(self):
+        # Arrange
+        self.user = CustomUser.objects.create_user(**self.data) # ici le signal va creer auto le profile
+
+    def test_if_profile_exist_success(self):
+        # Act 
+        response = self.client.get(reverse('profile-view', args=[self.user.id]))
+
+        # Assert 
+        self.assertEqual(response.status_code, 200)
 
     
 
