@@ -44,7 +44,9 @@ LOGIN_URL = 'login' # name du path
 # Application definition
 
 INSTALLED_APPS = [
+    'posts.apps.PostsConfig',
     'accounts.apps.AccountsConfig',
+    'core.apps.CoreConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
