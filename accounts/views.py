@@ -58,7 +58,7 @@ def logout_view(request):
     - require_POST : only work when the method is POST
     """
     logout(request)
-    return redirect('home')
+    return redirect('accounts:home')
     
 
 def register_view(request):
@@ -67,7 +67,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            return redirect('home')
+            return redirect('accounts:home')
     else:
         form = RegisterForm()
     return render(request, 'accounts/register.html', {'form':form})
@@ -83,7 +83,7 @@ def edit_profile_view(request):
         form = EditProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
-            return redirect('profile-view', pk=request.user.pk)
+            return redirect('accounts:profile-view', pk=request.user.pk)
     else:
         form = EditProfileForm(instance=profile)
 

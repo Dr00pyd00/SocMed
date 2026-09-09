@@ -5,6 +5,8 @@ from accounts import views
 # pour reset le mdp
 from django.contrib.auth import views as auth_views 
 
+app_name = 'accounts'
+
 urlpatterns = [
         path('home/', views.home_view, name='home'),
         path('login/', views.login_view, name='login'),
