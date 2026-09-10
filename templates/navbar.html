@@ -4,11 +4,14 @@
     <a href="{% url 'accounts:home' %}" class="sidebar-brand">SocMed</a>
 
     <div class="sidebar-nav">
-        <a href="{% url 'accounts:home' %}" class="sidebar-link">Accueil</a>
+        <!-- <a href="{% url 'accounts:home' %}" class="sidebar-link">Accueil</a> -->
+        <a href="{% url 'posts:post-feed' %}" class="sidebar-link">Home</a>
         {# tu ajouteras Profil, Explorer… au fur et à mesure que les pages existent #}
 
         {% if user.is_authenticated %}
         <a href="{% url 'accounts:profile-view' user.profile.id %}" class="sidebar-link">Profile</a>
+        <a href="{% url 'posts:post-mines-list' %}" class="sidebar-link">My Posts</a>
+        <a href="{% url 'posts:post-creation' %}" class="sidebar-link">Create NEW Post</a>
         {% endif %}
 
     </div>
