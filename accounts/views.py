@@ -35,7 +35,7 @@ def login_view(request):
                 # vu que User est not None l'auth a reussi , plus besoin de pw
                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 # c'est le @required_login qui inject le ?next auto on le recup ici si il existe, dans le html il faut le catch et le donner ici grace a un input hidden
-                next_url = request.POST.get('next') or request.GET.get('next') or 'home'
+                next_url = request.POST.get('next') or request.GET.get('next') or 'accounts:home'
                 return redirect(next_url)
             else:
                 form.add_error(None, 'Incorrect Credentials')
