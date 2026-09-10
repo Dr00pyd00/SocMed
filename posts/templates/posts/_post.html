@@ -1,0 +1,18 @@
+
+
+<article class="post">
+    {% if post.image %}
+        <img src="{{ post.image.url }}" alt="Image du post">
+    {% endif %}
+    {% if post.text %}
+        <p>{{ post.text }}</p>
+    {% endif %}
+    <p class="post-meta">{{ post.user }} — {{ post.created_at }}</p>
+
+     {% if request.user.id == post.user.id %}
+            <a href="{% url 'posts:post-update' post.id %}" class="post-update-link">update</a>
+            <a href="{% url 'posts:post-delete' post.id %}" class="post-delete-link">delete</a>
+     {% endif %}
+
+
+</article>

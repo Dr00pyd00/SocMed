@@ -1,0 +1,23 @@
+
+{% extends "base.html" %}
+
+{% block title %}List Post{% endblock %}
+
+{% block content %}
+
+    <h1>Feed Post:</h1>
+
+    {% for post in page_obj %}
+            {% include "posts/_post.html" with post=post %}
+    {% empty %}
+        <p>No posts for now!</p>
+        <a href="{% url 'posts:post-creation' %}">Create One!</a>
+       
+    {% endfor %}
+
+    {% if page_obj.paginator.count %}
+        {% include "_pagination.html" with page_obj=page_obj only %}
+    {% endif %}
+   
+{% endblock %}
+

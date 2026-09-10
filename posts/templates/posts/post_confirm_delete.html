@@ -1,0 +1,19 @@
+
+{% extends "base.html" %}
+
+{% block title %}Confirm delete Post{% endblock %}
+
+{% block content %}
+
+<h1>Are you sure to delete the post {{post.id}} ?</h1>
+
+<form action="{% url 'posts:post-delete' post.id %}" method="POST" >
+    {% csrf_token %}
+    <button type="submit">Yes DELETE !</button>
+</form>
+
+<a href="{% url 'accounts:home' %}">No back!</a>
+
+   
+{% endblock %}
+

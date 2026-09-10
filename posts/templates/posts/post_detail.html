@@ -5,28 +5,10 @@
 
 {% block content %}
 
-<h1>Detail Post:</h1>
+    <h1>Detail Post:</h1>
 
-    {% if post.image %} 
-    <img src="{{post.image.url}}" alt="Post Image">
-    {% else %}
-    <small>No image for this post...</small>
-    {% endif %}
+        {% include "posts/_post.html" with post=post %}
 
-    {% if post.text %}
-    <p>{{post.text}}</p>
-    {% else %}
-    <small>No text for this post...</small>
-    {% endif %}
-
-    <small>Published by: {{post.user}} at {{post.created_at}}</small>
-
-    
-
-
-
-
-
-   
+  
 {% endblock %}
 

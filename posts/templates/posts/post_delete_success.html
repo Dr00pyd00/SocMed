@@ -1,0 +1,17 @@
+
+{% extends "base.html" %}
+
+{% block title %}Confirm delete Post{% endblock %}
+
+{% block content %}
+
+<h1>Post deleted Successfully !!</h1>
+
+    
+<div>
+    <a href="{% url 'posts:post-feed' %}">Go to the Feed!</a>
+</div>
+
+   
+{% endblock %}
+
