@@ -38,7 +38,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(','
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # address ou ca redirige si besoin de login
-LOGIN_URL = 'login' # name du path 
+LOGIN_URL = 'accounts:login' # name du path 
 
 
 # Application definition

@@ -19,18 +19,18 @@ class RegisterViewTest(TestCase):
     
     def test_register_with_valid_data_create_user_success(self):
         # Act 
-        response = self.client.post(reverse('register'), self.good_data)
+        response = self.client.post(reverse('accounts:register'), self.good_data)
 
         # Assert
         self.assertEqual(response.status_code, 302) # redirection apres formulaire 
-        self.assertRedirects(response, reverse('home'))
+        self.assertRedirects(response, reverse('accounts:home'))
         self.assertEqual(CustomUser.objects.count(), 1)
         self.assertEqual(CustomUser.objects.first().email, 'test@example.com')
 
 
     def test_user_login_automatically_after_register_success(self):
         # Act 
-        response = self.client.post(reverse('register'), self.good_data)
+        response = self.client.post(reverse('accounts:register'), self.good_data)
 
         # Assert 
         self.assertTrue(response.wsgi_request.user.is_authenticated)
@@ -41,7 +41,7 @@ class RegisterViewTest(TestCase):
         bad_pw2_data = {**self.good_data, 'password2':'BadPassWord123'}
 
         # Act 
-        response = self.client.post(reverse('register'), bad_pw2_data)
+        response = self.client.post(reverse('accounts:register'), bad_pw2_data)
 
         # Assert
         self.assertEqual(CustomUser.objects.count(), 0)
@@ -53,7 +53,7 @@ class RegisterViewTest(TestCase):
         CustomUser.objects.create_user(email=self.good_data['email'], password=self.good_data['password1'])
 
         # Act
-        response = self.client.post(reverse('register'), self.good_data)
+        response = self.client.post(reverse('accounts:register'), self.good_data)
 
         # Assert
         self.assertEqual(CustomUser.objects.count(), 1)
@@ -63,7 +63,7 @@ class RegisterViewTest(TestCase):
         bad_pw_data = {**self.good_data, 'password1':'123', 'password2':'123'}
 
         # Act 
-        response = self.client.post(reverse('register'), bad_pw_data)
+        response = self.client.post(reverse('accounts:register'), bad_pw_data)
 
         # Assert
         self.assertEqual(CustomUser.objects.count(), 0)
@@ -80,16 +80,16 @@ class  LoginViewTest(TestCase):
 
     def test_login_with_good_credentials_redirect_success(self):
         # Act 
-        response = self.client.post(reverse('login'), self.data)
+        response = self.client.post(reverse('accounts:login'), self.data)
 
         # Assert 
-        self.assertRedirects(response, reverse('home'))
+        self.assertRedirects(response, reverse('accounts:home'))
         self.assertEqual(response.wsgi_request.user.is_authenticated, True)
 
 
     def test_login_with_bad_credential_pw_fail(self):
         # Act 
-        response = self.client.post(reverse('login'), {**self.data, 'password':'BadPassWord123'})
+        response = self.client.post(reverse('accounts:login'), {**self.data, 'password':'BadPassWord123'})
 
         # Assert 
         self.assertFalse(response.wsgi_request.user.is_authenticated)
@@ -98,7 +98,7 @@ class  LoginViewTest(TestCase):
 
     def test_login_with_inexistant_email_fail(self):
         # Act 
-        response = self.client.post(reverse('login'), {**self.data, 'email':'bad@gmail.com'})
+        response = self.client.post(reverse('accounts:login'), {**self.data, 'email':'bad@gmail.com'})
 
         # Assert 
         self.assertFalse(response.wsgi_request.user.is_authenticated)
@@ -118,11 +118,11 @@ class LogoutViewTest(TestCase):
         self.client.force_login(self.user)
 
         # Act 
-        response = self.client.post(reverse('logout'))
+        response = self.client.post(reverse('accounts:logout'))
 
         # Assert
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('home'))
+        self.assertRedirects(response, reverse('accounts:home'))
         
 
         
@@ -132,7 +132,7 @@ class LogoutViewTest(TestCase):
         self.client.force_login(self.user)
 
         # Act 
-        response = self.client.get(reverse('logout'))
+        response = self.client.get(reverse('accounts:logout'))
 
         # Assert 
         self.assertEqual(response.status_code, 405)  # method not allowed
@@ -142,11 +142,11 @@ class LogoutViewTest(TestCase):
         # on se login pas ...
 
         # Act 
-        response = self.client.post(reverse('logout'))
+        response = self.client.post(reverse('accounts:logout'))
 
         # Assert 
         self.assertEqual(response.status_code, 302)
-        # self.assertRedirects(response, reverse('login')) #TODO marche pas met une url auto gerner plus complexe
+        # self.assertRedirects(response, reverse('accounts:login')) #TODO marche pas met une url auto gerner plus complexe
 
 
     def test_logout_ends_session_sucess(self):
@@ -154,8 +154,8 @@ class LogoutViewTest(TestCase):
         self.client.force_login(self.user)
 
         # Act 
-        self.client.post(reverse('logout'))
-        response = self.client.get(reverse('home'))
+        self.client.post(reverse('accounts:logout'))
+        response = self.client.get(reverse('accounts:home'))
 
         # Assert 
         self.assertFalse(response.wsgi_request.user.is_authenticated)
@@ -180,7 +180,7 @@ class ProfileViewTest(TestCase):
 
     def test_if_profile_exist_success(self):
         # Act 
-        response = self.client.get(reverse('profile-view', args=[self.user.id]))
+        response = self.client.get(reverse('accounts:profile-view', args=[self.user.id]))
 
         # Assert 
         self.assertEqual(response.status_code, 200)
@@ -188,7 +188,7 @@ class ProfileViewTest(TestCase):
 
     def test_if_profile_not_exist_fail(self):
         # Act 
-        response = self.client.get(reverse('profile-view', args=['999']))
+        response = self.client.get(reverse('accounts:profile-view', args=['999']))
 
         # Assert 
         self.assertEqual(response.status_code, 404)
@@ -205,12 +205,12 @@ class ProfileViewTest(TestCase):
         }
 
         # Act 
-        response = self.client.post(reverse('profile-edit'), new_data)
+        response = self.client.post(reverse('accounts:profile-edit'), new_data)
         self.user.profile.refresh_from_db() # ne pas oublier sinon update pas prise en compte en memoire
 
         # Assert 
         self.assertEqual(response.status_code, 302)     # car ya un redirect dans la view
-        self.assertRedirects(response, reverse('profile-view', args=[self.user.pk])) # on cverifie la redirection precise
+        self.assertRedirects(response, reverse('accounts:profile-view', args=[self.user.pk])) # on cverifie la redirection precise
         self.assertEqual(self.user.profile.pseudo, new_data['pseudo'])
         self.assertEqual(self.user.profile.bio, new_data['bio'])
 
@@ -227,7 +227,7 @@ class ProfileViewTest(TestCase):
         }
 
         # Act 
-        response = self.client.post(reverse('profile-edit'), new_data)
+        response = self.client.post(reverse('accounts:profile-edit'), new_data)
         self.user.profile.refresh_from_db() # ne pas oublier sinon update pas prise en compte en memoire
 
         # Assert 
@@ -238,7 +238,7 @@ class ProfileViewTest(TestCase):
 
     def test_profile_update_without_login_fail(self):
         # Act 
-        response = self.client.get(reverse('profile-edit'))
+        response = self.client.get(reverse('accounts:profile-edit'))
 
         # Assert 
         self.assertEqual(response.status_code, 302) # redirection vers LOGIN_URL
@@ -264,7 +264,7 @@ class ProfileViewTest(TestCase):
         }
 
         # Act
-        self.client.post(reverse('profile-edit'), data)
+        self.client.post(reverse('accounts:profile-edit'), data)
         self.user.profile.refresh_from_db()
 
         # Assert
@@ -285,7 +285,7 @@ class ProfileViewTest(TestCase):
         }
 
         # Act 
-        self.client.post(reverse('profile-edit'), data)
+        self.client.post(reverse('accounts:profile-edit'), data)
         self.user.profile.refresh_from_db()
 
         # Assert
