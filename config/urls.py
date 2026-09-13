@@ -19,11 +19,16 @@ from django.urls import path, include
 
 from django.conf import settings
 from django.conf.urls.static import static
+from core.views import health
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('posts/', include('posts.urls')),
+
+    # test healthy pour container:
+    path('healthz/', health),
+
 
 
 ]
