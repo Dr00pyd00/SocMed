@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from accounts.forms import EditProfileForm, LoginForm, RegisterForm
 from accounts.models import CustomUser
@@ -36,7 +37,10 @@ def login_view(request):
                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 # c'est le @required_login qui inject le ?next auto on le recup ici si il existe, dans le html il faut le catch et le donner ici grace a un input hidden
                 next_url = request.POST.get('next') or request.GET.get('next') or 'accounts:home'
-                return redirect(next_url)
+                next_url = request.POST.get('next') or request.GET.get('next')
+                if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+                    return redirect(next_url)
+                return redirect('accounts:home')
             else:
                 form.add_error(None, 'Incorrect Credentials')
     else:
