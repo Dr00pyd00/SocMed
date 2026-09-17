@@ -3,10 +3,36 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from posts.models import Post
 
+# pour l'image de test
+from io import BytesIO
+from PIL import Image 
+from django.core.files.uploadedfile import SimpleUploadedFile 
+
+# pour override le dossier media
+import tempfile 
+from django.test import override_settings
+
+
 User = get_user_model()
 
+def create_test_image():
+    """ return a SimpleUploadedFile image for the tests 
+    Using Pillow and BytesIO for stock it in RAM  only """
+    # creer image 10px en memoire
+    file = BytesIO()
+    image = Image.new('RGB', (10,10), color='red')
+    image.save(file, 'JPEG')
+    file.seek(0)
+    # l'emballer comme un fichier upload 
+    return SimpleUploadedFile(
+            name='test.jpg',
+            content=file.read(),
+            content_type='image/jpeg',
+            )
+    
 
-# BASE
+
+# BASE =================================================================================================
 class PostBaseTest(TestCase):
     """ basics arranges for tests about posts """
     def setUp(self):
@@ -122,7 +148,60 @@ class PostUpdateTest(PostBaseTest):
 
 
 
-    
+class PostDeleteTest(PostBaseTest):
+
+    def test_delete_existant_post_with_owner_success(self):
+        # Arrange 
+        self.client.force_login(self.owner)
+        # Act 
+        response = self.client.post(reverse('posts:post-delete', kwargs={'pk':self.post.id}))
+        # Assert 
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Post.objects.count(), 0)
+
+    def test_delete_existant_post_with_no_owner_fail(self):
+        # Arrange 
+        self.client.force_login(self.other)
+        # Act 
+        response = self.client.post(reverse('posts:post-delete', kwargs={'pk':self.post.id}))
+        # Assert 
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Post.objects.filter(pk=self.post.id).exists())
+
+    def test_delete_inexistant_post_with_owner_fail(self):
+        # Arrange 
+        self.client.force_login(self.owner)
+        # Act 
+        response = self.client.post(reverse('posts:post-delete', kwargs={'pk':99999}))
+        # Assert 
+        self.assertEqual(response.status_code, 404) 
+
+    def test_delete_existant_post_without_anonynous_fail(self):
+        # Arrange 
+        # Act 
+        response = self.client.post(reverse('posts:post-delete', kwargs={'pk':self.post.id}))
+        # Assert 
+        self.assertEqual(response.status_code, 302) # vers login 
+        self.assertIn(reverse('accounts:login'), response.url)
+        self.assertTrue(Post.objects.filter(pk=self.post.id).exists())
+
+
+# tempfile.mkdtemp() : creer un dossier temporaire 
+# remplace la variable contenu dans settings juste pour ces tests de cette classe
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+class PostImageCreateTest(PostBaseTest):
+
+    def test_create_post_with_image_success(self):
+        # Arrange
+        self.client.force_login(self.owner)
+        post_image = create_test_image()
+        post_data = {'text':'post with image test','image':post_image}
+        # Act
+        response = self.client.post(reverse('posts:post-creation'), post_data)
+        self.assertEqual(response.status_code, 302)
+        created_post = Post.objects.get(text='post with image test')
+        self.assertTrue(created_post.image)
+  
 
 
         
