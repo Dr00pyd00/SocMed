@@ -18,6 +18,15 @@ from decouple import config
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
+# si en production alors DEBUG est False ===> setup pout reel https =========================================
+if not DEBUG:
+    # forcer toutes requete http a passer en https:
+    SECURE_SSL_REDIRECT = True
+    # cookies de session ne passe QUE par du https
+    SESSION_COOKIE_SECURE = True
+    # le token CSFR ne passe QUE en https 
+    CSRF_COOKIE_SECURE = True
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
