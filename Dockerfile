@@ -15,6 +15,8 @@ COPY requirements.txt .
 # pas de cache: moins encombrant
 RUN pip install --no-cache-dir  -r requirements.txt
 
+COPY . .
+RUN chmod +x entrypoint.sh
 
 COPY . .
 # CMD ["gunicorn","config.wsgi:application","--bind","0.0.0.0:8000","--reload"]
