@@ -36,7 +36,6 @@ def login_view(request):
                 # vu que User est not None l'auth a reussi , plus besoin de pw
                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 # c'est le @required_login qui inject le ?next auto on le recup ici si il existe, dans le html il faut le catch et le donner ici grace a un input hidden
-                next_url = request.POST.get('next') or request.GET.get('next') or 'accounts:home'
                 next_url = request.POST.get('next') or request.GET.get('next')
                 if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
                     return redirect(next_url)
