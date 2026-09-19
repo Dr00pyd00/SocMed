@@ -19,15 +19,17 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # si en production alors DEBUG est False ===> setup pout reel https =========================================
-if not DEBUG:
-    # forcer toutes requete http a passer en https:
-    SECURE_SSL_REDIRECT = True
-    # cookies de session ne passe QUE par du https
-    SESSION_COOKIE_SECURE = True
-    # le token CSFR ne passe QUE en https 
-    CSRF_COOKIE_SECURE = True
-
-
+# if not DEBUG:
+#     # forcer toutes requete http a passer en https:
+#     SECURE_SSL_REDIRECT = True
+#     # cookies de session ne passe QUE par du https
+#     SESSION_COOKIE_SECURE = True
+#     # le token CSFR ne passe QUE en https 
+#     CSRF_COOKIE_SECURE = True
+#     # normanelement TOUT est forcer en httpS mais il faut que le helthck reste en http donc on met l'exception:
+#     SECURE_REDIRECT_EXEMPT = [r'^healthz/$']
+#
+#
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -53,6 +55,8 @@ LOGIN_URL = 'accounts:login' # name du path
 # Application definition
 
 INSTALLED_APPS = [
+    'cloudinary_storage',
+    'cloudinary',
     'posts.apps.PostsConfig',
     'accounts.apps.AccountsConfig',
     'core.apps.CoreConfig',
@@ -188,6 +192,29 @@ AXES_LOCKOUT_PARAMETERS = ['username', 'ip_address']   # bloque par email, pas j
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Setup pour image en prod: Cloudinary
+if not DEBUG:
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+        'API_KEY': config('CLOUDINARY_API_KEY'),
+        'API_SECRET': config('CLOUDINARY_API_SECRET'),
+    }
+
+    # DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+    STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+
+
+
 
 
 
