@@ -203,13 +203,23 @@ if not DEBUG:
         'API_SECRET': config('CLOUDINARY_API_SECRET'),
     }
 
+    
+    #         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    #     },
+    #     "staticfiles": {
+    #         "BACKEND": "config.storage_backends.ForgivingManifestStaticFilesStorage",
+    #     },
+    # }
+    #
+    # STATICFILES_STORAGE = "config.storage_backends.ForgivingManifestStaticFilesStorage"
+    #
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            "BACKEND": "config.storage_backends.ForgivingManifestStaticFilesStorage",
+            "BACKEND": "whitenoise.storage.StaticFilesStorage",
         },
     }
+    STATICFILES_STORAGE = "whitenoise.storage.StaticFilesStorage"
 
-    STATICFILES_STORAGE = "config.storage_backends.ForgivingManifestStaticFilesStorage"
