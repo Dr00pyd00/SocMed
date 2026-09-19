@@ -208,10 +208,8 @@ if not DEBUG:
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.ManifestStaticFilesStorage",
+            "BACKEND": "config.storage_backends.ForgivingManifestStaticFilesStorage",
         },
     }
-    
-    STATICFILES_STORAGE = "whitenoise.storage.ManifestStaticFilesStorage"
 
-
+    STATICFILES_STORAGE = "config.storage_backends.ForgivingManifestStaticFilesStorage"
